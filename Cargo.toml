@@ -11,8 +11,5 @@ path = "src/bf_interpreter.rs"
 name = "bf_ir"
 path = "src/bf_ir.rs"
 
-[[bin]]
-name = "bf_jit"
-path = "src/bf_jit.rs"
 
 [dependencies]
