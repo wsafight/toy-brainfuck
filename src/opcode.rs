@@ -1,5 +1,3 @@
-use std::{collections::HashMap, error::Error};
-
 #[derive(Debug, PartialEq)]
 pub enum Opcode {
     SHR = 0x3E,
@@ -30,11 +28,11 @@ impl From<u8> for Opcode {
 
 pub struct Code {
     pub instrs: Vec<Opcode>,
-    pub jtable: HashMap<usize, usize>,
+    pub jtable: std::collections::HashMap<usize, usize>,
 }
 
 impl Code {
-    pub fn from(data: Vec<u8>) -> Result<Self, Box<dyn Error>> {
+    pub fn from(data: Vec<u8>) -> Result<Self, Box<dyn std::error::Error>> {
         let dict = vec![
             Opcode::SHR as u8,
             Opcode::SHL as u8,
@@ -51,22 +49,18 @@ impl Code {
             .map(|x| Opcode::from(*x))
             .collect();
         let mut jstack: Vec<usize> = Vec::new();
-        let mut jtable: HashMap<usize, usize> = HashMap::new();
+        let mut jtable: std::collections::HashMap<usize, usize> = std::collections::HashMap::new();
 
         for (index, val) in instrs.iter().enumerate() {
             if Opcode::LB == *val {
                 jstack.push(index);
-            }
-            if Opcode::RB == *val {
+            } else if Opcode::RB == *val {
                 let lb_code_index = jstack.pop().ok_or("error")?;
                 jtable.insert(lb_code_index, index);
                 jtable.insert(index, lb_code_index);
             }
         }
 
-        Ok(Code {
-            instrs,
-            jtable,
-        })
+        Ok(Code { instrs, jtable })
     }
 }
